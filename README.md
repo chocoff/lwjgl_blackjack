@@ -26,7 +26,6 @@ The project follows the standard Gradle directory layout:
 * `/models`: 3D objects for cards, chips, and environment.
 * `/shaders`: GLSL vertex and fragment shaders.
 * `/sounds`: Game music and sound effects.
-* `/textures`: Image files for model skins and UI.
 
 
 
