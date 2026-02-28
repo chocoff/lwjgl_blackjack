@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+import org.gradle.internal.os.OperatingSystem
+
+project.ext {
+    lwjglV = "3.3.3" 
+    imguiV = "1.90.0"
+    jomlV  = "1.10.8"
+    
+    switch ( OperatingSystem.current() ) {
+        case OperatingSystem.WINDOWS:
+            platform = "windows"
+            break
+        case OperatingSystem.LINUX:
+            platform = "linux"
+            break
+        case OperatingSystem.MAC_OS:
+            platform = "macos"
+            break
+    }
+}
+
+dependencies {
+    // JOML & Tinylog (Platform Independent)
+    implementation "org.joml:joml:${project.jomlV}"
+    implementation "org.tinylog:tinylog-api:2.7.0"
+    implementation "org.tinylog:tinylog-impl:2.7.0"
+
+    // ImGui (Java bindings)
+    implementation "io.github.spair:imgui-java-app:${project.imguiV}"
+    implementation "io.github.spair:imgui-java-binding:${project.imguiV}"
+    implementation "io.github.spair:imgui-java-lwjgl3:${project.imguiV}"
+
+    // LWJGL Core & Modules
+    implementation platform("org.lwjgl:lwjgl-bom:${project.lwjglV}")
+
+    def modules = ["", "-glfw", "-opengl", "-openal", "-stb", "-assimp", "-vulkan"]
+    modules.each { m ->
+        implementation "org.lwjgl:lwjgl${m}"
+        runtimeOnly "org.lwjgl:lwjgl${m}:natives-${project.platform}"
+    }
+}
+
+application {
+    mainClass = 'blackjack.game.Main'
+}
