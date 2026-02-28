@@ -1,6 +1,21 @@
-/bin
+bin/
 lib/
 .gradle/
 build/
 *.jar
 .DS_Store
+Thumbs.db
+*.log
+*.so
+*.dll
+*.dylib
+
+#ide specific files
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+
