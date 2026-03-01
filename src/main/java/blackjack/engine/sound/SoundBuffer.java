@@ -48,21 +48,28 @@ public class SoundBuffer {
 
 
     // transform OGG format into PCM format
-    private ShortBuffer readVorbis(String filePath, STBVorbisInfo info){
-        
+    private ShortBuffer readVorbis(String filePath, STBVorbisInfo info) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            
-            IntBuffer error = stack.mallocInt(1);
-            long decoder = stb_vorbis_open_filename(filePath, error, null);
+            // 1. Load the sound file from the Classpath into a ByteBuffer
+            ByteBuffer resourceBuffer;
+            try {
+                // This uses the Utils helper you added for textures/models
+                resourceBuffer = blackjack.engine.Utils.ioResourceToByteBuffer(filePath, 1024 * 1024);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("SOUND FILE [" + filePath + "] NOT FOUND", e);
+            }
 
-            if (decoder == NULL){
-                throw new RuntimeException("Failed to open OGG, error: " + error.get(0));
+            // 2. Open the Vorbis decoder from the memory buffer instead of a filename
+            IntBuffer error = stack.mallocInt(1);
+            long decoder = stb_vorbis_open_memory(resourceBuffer, error, null);
+
+            if (decoder == NULL) {
+                throw new RuntimeException("Failed to open OGG from memory, error: " + error.get(0));
             }
 
             stb_vorbis_get_info(decoder, info);
 
             int channels = info.channels();
-            
             int lengthSamples = stb_vorbis_stream_length_in_samples(decoder);
 
             ShortBuffer result = MemoryUtil.memAllocShort(lengthSamples * channels);

@@ -43,5 +43,10 @@ public class Consts {
     public static final int MAX_BONES = 150;
     public static final Matrix4f IDENTITY_MATRIX = new Matrix4f();
     public static final Matrix4f[] DEFAULT_BONES_MATRICES = new Matrix4f[MAX_BONES];
+    static {
+        for (int i = 0; i < MAX_BONES; i++) {
+            DEFAULT_BONES_MATRICES[i] = new Matrix4f();
+        }
+    }
 
 }

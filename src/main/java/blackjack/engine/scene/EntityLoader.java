@@ -205,8 +205,14 @@ public class EntityLoader {
         bobEntity = new Entity("bob-entity", bobModel.getId(), false);
         bobEntity.setScale(0.05f);
         bobEntity.setPosition(0, -0.5f, -0.5f);
-        animationData = new AnimationData(bobModel.getAnimationList().get(0));
-        bobEntity.setAnimationData(animationData);
+//        animationData = new AnimationData(bobModel.getAnimationList().get(0));
+	if (!bobModel.getAnimationList().isEmpty()) {
+	  animationData = new AnimationData(bobModel.getAnimationList().get(0));
+	  bobEntity.setAnimationData(animationData);
+	} else {
+	  System.err.println("Warning: no animations found for Bob model");
+	}
+//        bobEntity.setAnimationData(animationData);
                 
         cubeEntity = new Entity("cube-entity", cubeModel.getId(), true);
         cubeEntity.setPosition(0.0f, 0.0f, -2.0f);
@@ -534,7 +540,7 @@ public class EntityLoader {
 
                 Model backModel = ModelLoader.loadModel(
                     "back-model",
-                    "models/backCard/back.obj",
+                    "/models/backCard/back.obj",
                     scene.getTextureCache(),
                     false
                 );

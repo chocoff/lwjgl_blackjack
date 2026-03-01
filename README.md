@@ -2,6 +2,14 @@
 
 A 3D Blackjack game built using Java, the [Lightweight Java Game Library (LWJGL 3)](www.lwjgl.org), and the [Assimp](https://github.com/assimp/assimp) asset import library. This project features a fully rendered casino environment, animated dealer models, spatial audio, and interactive 3D chip betting mechanics.
 
+**README Navigation:**
+* [Features](#features)
+* [Prerequisites](#prerequisites)
+* [Project Structure](#project-structure)
+* [Building and Running](#building-and-running)
+* [How to play](#how-to-play)
+* [Dependencies](#dependencies)
+* [Disccusion, credits and acknowledgements](#discussion-credits-and-acknowledgements)
 ## Features
 
 * **3D Graphics Engine:** Custom engine implementation using OpenGL, featuring spot lights, point lights, and ambient lighting.
@@ -59,10 +67,12 @@ Run the application using the command prompt or PowerShell:
 
 ```
 
-## Controls
+## How to play
 
 * **Movement:** Use `W`, `A`, `S`, `D` to navigate the camera.
 * **Elevation:** Use `UP` and `DOWN` arrows to move the camera vertically.
+* **Play Blackjack** Use `P` to play the blackjack
+* **Toggle Cursor** Use `L` to show cursor and `K` to hide it.
 * **Interaction:** * `Left Click`: Select chips to bet.
 * `Right Click`: Remove/undo bets.
 

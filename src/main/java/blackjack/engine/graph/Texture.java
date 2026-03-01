@@ -16,7 +16,6 @@ public class Texture {
         this.texturePath = "";
         generateTexture(width, height, buf);
     }
-
     public Texture(String texturePath) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             this.texturePath = texturePath;
@@ -24,7 +23,17 @@ public class Texture {
             IntBuffer h = stack.mallocInt(1);
             IntBuffer channels = stack.mallocInt(1);
 
-            ByteBuffer buf = stbi_load(texturePath, w, h, channels, 4);
+            // 1. Load the resource into a ByteBuffer from the Classpath
+            ByteBuffer resourceBuffer;
+            try {
+                // This utilizes the Utils helper you added previously
+                resourceBuffer = blackjack.engine.Utils.ioResourceToByteBuffer(texturePath, 1024 * 1024);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("IMAGE FILE [" + texturePath + "] NOT FOUND", e);
+            }
+
+            // 2. Decode the image from memory instead of a file path
+            ByteBuffer buf = stbi_load_from_memory(resourceBuffer, w, h, channels, 4);
             if (buf == null) {
                 throw new RuntimeException("IMAGE FILE [" + texturePath + "] NOT LOADED: " + stbi_failure_reason());
             }

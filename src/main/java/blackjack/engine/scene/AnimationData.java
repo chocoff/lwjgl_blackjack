@@ -11,8 +11,9 @@ public class AnimationData {
 
 
     static {
-        Matrix4f zeroMatrix = new Matrix4f().zero();
-        Arrays.fill(Consts.DEFAULT_BONES_MATRICES, zeroMatrix);
+        for (int i = 0; i < Consts.MAX_BONES; i++){
+            Consts.DEFAULT_BONES_MATRICES[i] = new Matrix4f().zero();
+        }
     }
 
     private Model.Animation currentAnimation;

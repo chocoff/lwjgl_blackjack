@@ -56,7 +56,7 @@ public class Main implements IAppLogic {
         camera.setPosition(-1.5f, 2.0f, 4.5f);
         camera.addRotation((float) Math.toRadians(15.0f), (float) Math.toRadians(390.f));
 
-        initSounds(entityLoader.getBobEntity().getPosition(), camera);
+//        initSounds(entityLoader.getBobEntity().getPosition(), camera);
         scene.setGuiInstance(new BlackJackGui());
 
     }
@@ -155,7 +155,7 @@ public class Main implements IAppLogic {
         
         // Load sound effects
         //soundManager.loadSound("SFX_BUTTON_1", "/sounds/button_soundEffect_1.ogg");
-        soundManager.loadSound("SFX_BUTTON_2", "sounds/button_soundEffect_2.ogg");
+        soundManager.loadSound("SFX_BUTTON_2", "/sounds/button_soundEffect_2.ogg");
         soundManager.loadSound("SFX_CARD", "/sounds/card_soundEffect.ogg");
         soundManager.loadSound("SFX_CHIP_1", "/sounds/chip_soundEffect_01.ogg");
         soundManager.loadSound("SFX_CHIP_2", "/sounds/chip_soundEffect_02.ogg");
@@ -182,7 +182,7 @@ public class Main implements IAppLogic {
     }
 
     private void initSkyBoxAndFog(Scene scene) {
-        SkyBox skyBox = new SkyBox("/models/skybox.obj", scene.getTextureCache());
+        SkyBox skyBox = new SkyBox("/models/skybox/skybox.obj", scene.getTextureCache());
         skyBox.getSkyBoxEntity().setScale(100);
         skyBox.getSkyBoxEntity().updateModelMatrix();
         scene.setSkyBox(skyBox);
@@ -216,7 +216,7 @@ public class Main implements IAppLogic {
         } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
             camera.moveDown(move);;
         }
-        soundManager.updateListenerPosition(camera);        //Adapt listener position to player position
+//        soundManager.updateListenerPosition(camera);        //Adapt listener position to player position
 
 
         /*~~~ MOUSE INPUT ~~~*/
@@ -278,14 +278,16 @@ public class Main implements IAppLogic {
 /*~~~ UPDATE PER FRAME ~~~*/
     @Override
     public void update(Window window, Scene scene, long diffTimeMillis) {
-        entityLoader.getAnimationData().nextFrame();
-        if (entityLoader.getAnimationData().getCurrentFrameIdx() == 45){
-            playerSoundSource.play();
+        AnimationData animData = entityLoader.getAnimationData();
+        if (animData != null) {
+            animData.nextFrame();
+            if(animData.getCurrentFrameIdx() == 45){
+//                playerSoundSource.play();
+            }
         }
         if (BlackJackLogic.pendingButtonUpdate) {
             BlackJackLogic.pendingButtonUpdate = false;
             BlackJackLogic.getInstance().manageButtons(scene);
         }
     }
-
 }

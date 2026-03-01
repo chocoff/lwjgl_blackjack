@@ -15,6 +15,8 @@ import java.lang.Math;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.*;
+import java.net.URL;
+import java.net.URISyntaxException;
 
 import static org.lwjgl.assimp.Assimp.*;
 
@@ -35,79 +37,95 @@ public class ModelLoader {
         );
 
     }
-
     public static Model loadModel(String modelId, String modelPath, TextureCache textureCache, int flags) {
+        // Determine the base resource directory (for textures)
+        String modelDir = "";
+        int lastSlash = modelPath.lastIndexOf('/');
+        if (lastSlash != -1) {
+            modelDir = modelPath.substring(0, lastSlash);
+        }
 
-	ByteBuffer resourceBuffer;
-	try {
-	  resourceBuffer = Utils.ioResourceToByteBuffer(modelPath, 1024 * 1024);
-	} catch (IOException e) {
-	  throw new RuntimeException("Could not find resource: " + modelPath, e);
-	}
+        AIScene aiScene;
+        URL resourceUrl = ModelLoader.class.getResource(modelPath);
 
-	String extension = modelPath.substring(modelPath.lastIndexOf('.') + 1);
-	AIScene aiScene = aiImportFileFromMemory(resourceBuffer, flags, extension);
-	if (aiScene == null) {
-	  throw new RuntimeException("ERROR LOADING MODEL [path: " + modelPath + "]: " + aiGetErrorString());
-	}
-	  String modelDir = "";
-	  int lastSlash = modelPath.lastIndexOf('/');
-	  if (lastSlash != -1) {
-	    modelDir = modelPath.substring(0, lastSlash);
-	  }
-        /*
-         * process materials contained in the models, they define color and textures
-         * to be used by the meshes that compose the models
-         */
-	  int numMaterials = aiScene.mNumMaterials();
-	  List<Material> materialList = new ArrayList<>();
-	  for (int i = 0; i < numMaterials; i++) {
-	      AIMaterial aiMaterial = AIMaterial.create(aiScene.mMaterials().get(i));
-	      materialList.add(processMaterial(aiMaterial, modelDir, textureCache));
-	  }
+        if (resourceUrl != null && resourceUrl.getProtocol().equals("file")) {
+            // Load from file system – allows Assimp to follow external references (e.g., .md5anim)
+            try {
+                String absolutePath = new File(resourceUrl.toURI()).getAbsolutePath();
+                aiScene = aiImportFile(absolutePath, flags);
+                if (aiScene == null) {
+                    throw new RuntimeException("ERROR LOADING MODEL [path: " + absolutePath + "]: " + aiGetErrorString());
+                }
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Fall back to memory loading (e.g., when running from a JAR)
+            ByteBuffer resourceBuffer;
+            try {
+                resourceBuffer = Utils.ioResourceToByteBuffer(modelPath, 1024 * 1024);
+            } catch (IOException e) {
+                throw new RuntimeException("Could not find resource: " + modelPath, e);
+            }
+            String extension = modelPath.substring(modelPath.lastIndexOf('.') + 1);
+            aiScene = aiImportFileFromMemory(resourceBuffer, flags, extension);
+            if (aiScene == null) {
+                throw new RuntimeException("ERROR LOADING MODEL [path: " + modelPath + "]: " + aiGetErrorString());
+            }
+        }
 
-	  /*
-	   * process the different meshes, a model can define several meshes
-	   * and each of them can use one of the materials defined for the model
-	   * that is why this is done after materials and link to them, to avoid
-	   * repeating binding calss when rendering
-	   */
-	  int numMeshes = aiScene.mNumMeshes();
-	  PointerBuffer aiMeshes = aiScene.mMeshes();
-	  Material defaultMaterial = new Material();
+        // Process the loaded scene (materials, meshes, bones, animations)
+        Model model = processScene(aiScene, modelDir, textureCache, modelId);
 
-	  List<Bone> boneList = new ArrayList<>();
-	  for (int i = 0; i < numMeshes; i++) {
+        // Free Assimp resources
+        aiReleaseImport(aiScene);
 
-	      AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
-	      Mesh mesh = processMesh(aiMesh, boneList);
-	      int materialIdx = aiMesh.mMaterialIndex();
-	      Material material;
-	      if (materialIdx >= 0 && materialIdx < materialList.size()) {
-		  material = materialList.get(materialIdx);
-	      } else {
-		  material = defaultMaterial;
-	      }
-	      material.getMeshList().add(mesh);
-	  }
+        return model;
+    }
+    private static Model processScene(AIScene aiScene, String modelDir,
+                                      TextureCache textureCache, String modelId) {
+        // Process materials
+        int numMaterials = aiScene.mNumMaterials();
+        List<Material> materialList = new ArrayList<>();
+        for (int i = 0; i < numMaterials; i++) {
+            AIMaterial aiMaterial = AIMaterial.create(aiScene.mMaterials().get(i));
+            materialList.add(processMaterial(aiMaterial, modelDir, textureCache));
+        }
 
-	  if (!defaultMaterial.getMeshList().isEmpty()) {
-	      materialList.add(defaultMaterial);
-	  }
+        // Process meshes
+        int numMeshes = aiScene.mNumMeshes();
+        PointerBuffer aiMeshes = aiScene.mMeshes();
+        Material defaultMaterial = new Material();
+        List<Bone> boneList = new ArrayList<>();
 
-	  List<Model.Animation> animations = new ArrayList<>();
-	  int numAnimations = aiScene.mNumAnimations();
-	  if (numAnimations > 0) {
-	      Node rootNode = buildNodesTree(aiScene.mRootNode(), null);
-	      Matrix4f globalInverseTransformation = toMatrix(aiScene.mRootNode().mTransformation()).invert();
-	      animations = processAnimations(aiScene, boneList, rootNode, globalInverseTransformation);
-	  }
+        for (int i = 0; i < numMeshes; i++) {
+            AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
+            Mesh mesh = processMesh(aiMesh, boneList);
+            int materialIdx = aiMesh.mMaterialIndex();
+            Material material;
+            if (materialIdx >= 0 && materialIdx < materialList.size()) {
+                material = materialList.get(materialIdx);
+            } else {
+                material = defaultMaterial;
+            }
+            material.getMeshList().add(mesh);
+        }
 
-	  aiReleaseImport(aiScene);
+        if (!defaultMaterial.getMeshList().isEmpty()) {
+            materialList.add(defaultMaterial);
+        }
 
-	  return new Model(modelId, materialList, animations);
-    
-	}
+        // Process animations (if any)
+        List<Model.Animation> animations = new ArrayList<>();
+        int numAnimations = aiScene.mNumAnimations();
+        if (numAnimations > 0) {
+            Node rootNode = buildNodesTree(aiScene.mRootNode(), null);
+            Matrix4f globalInverseTransformation = toMatrix(aiScene.mRootNode().mTransformation()).invert();
+            animations = processAnimations(aiScene, boneList, rootNode, globalInverseTransformation);
+        }
+
+        return new Model(modelId, materialList, animations);
+    }
 
 //ANIMATION RELATED
     private static Node buildNodesTree(AINode aiNode, Node parentNode) {
