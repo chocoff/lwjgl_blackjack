@@ -97,9 +97,12 @@ These are some of the in-game visuals!
 Developed as a demo of a 3D game engine principles in Java. My interest on videogames propelled the idea of getting to know how a game engine works "under the hood" and having a common interest with the contributors in learning Java motivated us towards working on the project, seeing this as a great opportunity for familiarizing ourselves with the language while working on something that is related to our common hobby as well: videogames.  
 *PS:* learning about the math concepts behind meshes, shadows and lights was... funny, I think everyone interested should try building a game engine once (jk).  
 
-**Contributors** to this work are:
-[Nicolas Vega](github.com/NicoVegaPortaluppi) in charge of the blackjack game logic, 3D modeling and handling the usage of the engine (setting up the scene).
-[Aristides Gernhofer](github.com/CarlosAristGernhofer) contributed to the in-game sounds, as well as fixing some bugs with the Camera.
+**Contributors** to this work are:  
+
+[Nicolas Vega](github.com/NicoVegaPortaluppi) in charge of the blackjack game logic, 3D modeling and handling the usage of the engine (setting up the scene).  
+
+[Aristides Gernhofer](github.com/CarlosAristGernhofer) contributed to the in-game sounds, as well as fixing some bugs with the Camera.  
+
 [hadaperdida](github.com/hadaperdida) in charge of UI and menu configs.
 
 
