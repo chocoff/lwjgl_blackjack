@@ -1,4 +1,7 @@
 # Blackjack LWJGL Game
+![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
+![LWJGL](https://img.shields.io/badge/LWJGL-3-blue?logo=lwjgl)
+![Gradle](https://img.shields.io/badge/Build-Gradle-02303A?logo=gradle)  
 
 A 3D Blackjack game built using Java, the [Lightweight Java Game Library (LWJGL 3)](www.lwjgl.org), and the [Assimp](https://github.com/assimp/assimp) asset import library. This project features a fully rendered casino environment, animated dealer models, spatial audio, and interactive 3D chip betting mechanics.
 
