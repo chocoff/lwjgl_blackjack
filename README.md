@@ -8,6 +8,7 @@ A 3D Blackjack game built using Java, the [Lightweight Java Game Library (LWJGL 
 * [Project Structure](#project-structure)
 * [Building and Running](#building-and-running)
 * [How to play](#how-to-play)
+* [Screenshots](#screenshots)
 * [Dependencies](#dependencies)
 * [Disccusion, credits and acknowledgements](#discussion-credits-and-acknowledgements)
 ## Features
@@ -73,11 +74,16 @@ Run the application using the command prompt or PowerShell:
 * **Elevation:** Use `UP` and `DOWN` arrows to move the camera vertically.
 * **Play Blackjack** Use `P` to play the blackjack
 * **Toggle Cursor** Use `L` to show cursor and `K` to hide it.
-* **Interaction:** * `Left Click`: Select chips to bet.
-* `Right Click`: Remove/undo bets.
-
-
+* **Interaction:** * `Left Click`: Select chips to bet. `Right Click`: Remove/undo bets.  
 * **Debug Tools:** * `O`: Toggle the Light Controls UI panel (*Note:* currently buggy)
+
+## Screenshots
+These are some of the in-game visuals!
+![Initial view](./images/start.png)
+![View while playing](./images/play_scene.png)
+![Betting](./images/bet.png)
+![Dealer wins](./images/dealer_wins.png)
+
 
 ## Dependencies
 
